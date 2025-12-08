@@ -258,7 +258,7 @@ export class HaAuthFlow extends LitElement {
               : ""}
             <a
               class="forgot-password"
-              href="https://www.home-assistant.io/docs/locked_out/#forgot-password"
+              href="https://www.equicrew.com"
               target="_blank"
               rel="noreferrer noopener"
               >${this.localize("ui.panel.page-authorize.forgot_password")}</a

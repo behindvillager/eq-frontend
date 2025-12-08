@@ -57,7 +57,7 @@ class SupervisorErrorScreen extends LitElement {
               </li>
               <li>
                 <a
-                  href="https://www.home-assistant.io/help/"
+                  href="https://www.equicrew.com"
                   target="_blank"
                   rel="noreferrer"
                 >

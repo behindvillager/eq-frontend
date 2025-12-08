@@ -22,7 +22,7 @@ class OnboardingWelcomeLinks extends LitElement {
     return html`<a
         target="_blank"
         rel="noreferrer noopener"
-        href="https://www.home-assistant.io/blog/2016/01/19/perfect-home-automation/"
+        href="https://www.equicrew.com"
       >
         <onboarding-welcome-link
           noninteractive

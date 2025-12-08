@@ -146,7 +146,7 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
           inline-arrow
         ></ha-language-picker>
         <a
-          href="https://www.home-assistant.io/getting-started/onboarding/"
+          href="https://www.equicrew.com"
           target="_blank"
           rel="noreferrer noopener"
           >${this.localize("ui.panel.page-onboarding.help")}</a

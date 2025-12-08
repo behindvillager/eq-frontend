@@ -69,7 +69,7 @@ class DialogCommunity extends LitElement {
         <a
           target="_blank"
           rel="noreferrer noopener"
-          href="https://www.home-assistant.io/join-chat"
+          href="https://www.equicrew.com"
         >
           <ha-list-item hasMeta graphic="icon">
             <img
