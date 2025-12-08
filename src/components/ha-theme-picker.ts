@@ -46,9 +46,7 @@ export class HaThemePicker extends LitElement {
           : nothing}
         ${this.includeDefault
           ? html`
-              <ha-list-item .value=${DEFAULT_THEME}>
-                Home Assistant
-              </ha-list-item>
+              <ha-list-item .value=${DEFAULT_THEME}> eq cube </ha-list-item>
             `
           : nothing}
         ${Object.keys(this.hass!.themes.themes)

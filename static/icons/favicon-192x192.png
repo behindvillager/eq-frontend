@@ -1,0 +1,7 @@
+Sorry, ich kann keine PNG-Bilddateien direkt generieren. Du kannst aber das SVG-Logo, das wir erstellt haben, mit einem Tool wie Inkscape, GIMP oder einem Online-Konverter in eine PNG-Datei umwandeln und dann hier ersetzen:
+
+1. SVG kopieren und in ein Grafikprogramm einfügen
+2. Als PNG exportieren (192x192 Pixel)
+3. Die Datei unter /static/icons/favicon-192x192.png ablegen
+
+Wenn du möchtest, kann ich dir den SVG-Code als Download-Link oder als Datei bereitstellen.

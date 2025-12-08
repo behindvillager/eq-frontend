@@ -386,7 +386,7 @@ class HaSidebar extends SubscribeMixin(LitElement) {
             ></ha-icon-button>
           `
         : ""}
-      <div class="title">Home Assistant</div>
+      <div class="title">eq cube</div>
     </div>`;
   }
 
