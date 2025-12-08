@@ -11,17 +11,17 @@ import { extractVars } from "../../../common/style/derived-css-vars";
 export const coreColorStyles = css`
   html {
     /* primary */
-    --ha-color-primary-05: #001721;
-    --ha-color-primary-10: #002e3e;
-    --ha-color-primary-20: #004156;
-    --ha-color-primary-30: #006787;
-    --ha-color-primary-40: #009ac7;
-    --ha-color-primary-50: #18bcf2;
-    --ha-color-primary-60: #37c8fd;
-    --ha-color-primary-70: #7bd4fb;
-    --ha-color-primary-80: #b9e6fc;
-    --ha-color-primary-90: #dff3fc;
-    --ha-color-primary-95: #eff9fe;
+    --ha-color-primary-05: #051208;
+    --ha-color-primary-10: #0a1f12;
+    --ha-color-primary-20: #133321;
+    --ha-color-primary-30: #1a462e;
+    --ha-color-primary-40: #23935e;
+    --ha-color-primary-50: #2dad71;
+    --ha-color-primary-60: #38ce7f;
+    --ha-color-primary-70: #6ddb9f;
+    --ha-color-primary-80: #a0e9bf;
+    --ha-color-primary-90: #d0f5df;
+    --ha-color-primary-95: #e8faef;
 
     /* neutral */
     --ha-color-neutral-05: #141414;

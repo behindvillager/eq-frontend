@@ -13,17 +13,17 @@ export const colorStyles = css`
 
     /* main interface colors */
     --primary-color: var(--ha-color-primary-40);
-    --dark-primary-color: #0288d1;
-    --darker-primary-color: #016194;
-    --light-primary-color: #b3e5fc;
-    --accent-color: #ff9800;
+    --dark-primary-color: #1a6c43;
+    --darker-primary-color: #0f4829;
+    --light-primary-color: #a0e9bf;
+    --accent-color: #38ce7f;
     --divider-color: rgba(0, 0, 0, 0.12);
     --outline-color: rgba(0, 0, 0, 0.12);
     --outline-hover-color: rgba(0, 0, 0, 0.24);
 
     /* rgb */
-    --rgb-primary-color: 0, 154, 199;
-    --rgb-accent-color: 255, 152, 0;
+    --rgb-primary-color: 35, 147, 94;
+    --rgb-accent-color: 56, 206, 127;
     --rgb-primary-text-color: 33, 33, 33;
     --rgb-secondary-text-color: 114, 114, 114;
     --rgb-text-primary-color: 255, 255, 255;

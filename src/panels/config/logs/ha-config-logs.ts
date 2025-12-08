@@ -23,7 +23,7 @@ import { stringCompare } from "../../../common/string/compare";
 const logProviders: LogProvider[] = [
   {
     key: "core",
-    name: "Home Assistant Core",
+    name: "eq cube Core",
   },
   {
     key: "supervisor",
