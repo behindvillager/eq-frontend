@@ -5,17 +5,17 @@ import { customElement } from "lit/decorators";
 @customElement("ha-logo-svg")
 export class HaLogoSvg extends LitElement {
   protected render(): TemplateResult {
-    // RM-Logo: roter Kreis mit Durchmesser 192, mittig RM-Schriftzug
+    // eq Logo: grüner Kreis mit Durchmesser 192, mittig eq-Schriftzug
     return html`<svg
       width="192"
       height="192"
       viewBox="0 0 192 192"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="96" cy="96" r="96" fill="#FFD600" />
+      <circle cx="96" cy="96" r="96" fill="#38CE7F" />
       <text
         x="50%"
-        y="55%"
+        y="50%"
         font-family="'Arial Black', sans-serif"
         font-size="80"
         font-weight="900"
@@ -23,7 +23,7 @@ export class HaLogoSvg extends LitElement {
         text-anchor="middle"
         dominant-baseline="middle"
       >
-        RM
+        eq
       </text>
     </svg>`;
   }
