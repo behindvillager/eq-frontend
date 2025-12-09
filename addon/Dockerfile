@@ -1,4 +1,7 @@
 # Multi-stage build for Equicrew Frontend
+# Define ARG at the top level to be available across all stages
+ARG BUILD_FROM
+
 # Stage 1: Build the frontend
 FROM node:20-alpine AS builder
 
@@ -23,7 +26,7 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Create the runtime container
-# ARG must be before FROM to be available in FROM instruction
+# Re-declare ARG for this stage
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
