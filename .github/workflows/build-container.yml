@@ -71,8 +71,7 @@ jobs:
           context: .
           file: addon/Dockerfile
           platforms: ${{ steps.platform.outputs.platform }}
-          build-args: |
-            BUILD_FROM=${{ steps.base_image.outputs.image }}
+          build-args: BUILD_FROM=${{ steps.base_image.outputs.image }}
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/eq-frontend-${{ matrix.arch }}:latest
