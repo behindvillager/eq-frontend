@@ -39,12 +39,17 @@ RUN apk add --no-cache nginx
 # Copy built frontend from builder stage
 COPY --from=builder /build/hass_frontend /usr/share/nginx/html
 
-# Configure nginx
+# Configure nginx with larger buffer sizes for Home Assistant
 RUN mkdir -p /etc/nginx/http.d && \
     echo 'server {' > /etc/nginx/http.d/default.conf && \
     echo '    listen 8099;' >> /etc/nginx/http.d/default.conf && \
     echo '    root /usr/share/nginx/html;' >> /etc/nginx/http.d/default.conf && \
     echo '    index index.html;' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Increase buffer sizes for large URIs and headers' >> /etc/nginx/http.d/default.conf && \
+    echo '    large_client_header_buffers 4 32k;' >> /etc/nginx/http.d/default.conf && \
+    echo '    client_header_buffer_size 32k;' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
     echo '    location / {' >> /etc/nginx/http.d/default.conf && \
     echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/http.d/default.conf && \
     echo '    }' >> /etc/nginx/http.d/default.conf && \
