@@ -17,6 +17,8 @@ Dieses Add-on stellt eine angepasste Home Assistant Frontend-Version mit Equicre
 5. Füge die URL hinzu: `https://github.com/behindvillager/eq-frontend`
 6. Klicke **Add**
 
+**Wichtig**: Das Repository enthält jetzt die korrekte Struktur mit `repository.json` im Root und dem Add-on im `eq-frontend/` Verzeichnis.
+
 ## Schritt 2: Add-on installieren
 
 1. **Aktualisiere** die Add-on-Liste (falls das neue Repository nicht sofort erscheint)
