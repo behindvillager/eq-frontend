@@ -50,7 +50,11 @@ RUN mkdir -p /etc/nginx/http.d && \
     echo '    }' >> /etc/nginx/http.d/default.conf && \
     echo '}' >> /etc/nginx/http.d/default.conf
 
+# Copy run script
+COPY addon/run.sh /
+RUN chmod +x /run.sh
+
 EXPOSE 8099
 
-# Start nginx in foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Start via run.sh
+CMD ["/run.sh"]

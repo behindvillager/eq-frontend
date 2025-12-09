@@ -13,3 +13,7 @@ startup: services
 boot: auto
 init: false
 image: ghcr.io/behindvillager/eq-frontend-{arch}
+ports:
+  8099/tcp: 8099
+ports_description:
+  8099/tcp: "Frontend HTTP port"
