@@ -3,7 +3,8 @@
 ARG BUILD_FROM
 
 # Stage 1: Build the frontend
-FROM node:20-alpine AS builder
+# Always use amd64 for building (GitHub Actions runners are amd64)
+FROM --platform=linux/amd64 node:20-alpine AS builder
 
 WORKDIR /build
 
