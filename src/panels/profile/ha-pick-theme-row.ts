@@ -72,9 +72,7 @@ export class HaPickThemeRow extends LitElement {
           <ha-list-item .value=${USE_DEFAULT_THEME}>
             ${this.hass.localize("ui.panel.profile.themes.use_default")}
           </ha-list-item>
-          <ha-list-item .value=${HOME_ASSISTANT_THEME}>
-            Home Assistant
-          </ha-list-item>
+          <ha-list-item .value=${HOME_ASSISTANT_THEME}> eq cube </ha-list-item>
           ${this._themeNames.map(
             (theme) => html`
               <ha-list-item .value=${theme}>${theme}</ha-list-item>

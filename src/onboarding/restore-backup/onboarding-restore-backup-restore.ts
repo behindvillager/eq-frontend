@@ -133,7 +133,7 @@ class OnboardingRestoreBackupRestore extends LitElement {
             )}
             <ha-button
               slot="action"
-              href="https://www.home-assistant.io/installation/#advanced-installation-methods"
+              href="https://www.equicrew.com"
               target="_blank"
               rel="noreferrer noopener"
               size="small"

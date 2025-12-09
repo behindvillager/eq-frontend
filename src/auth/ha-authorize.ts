@@ -199,7 +199,7 @@ export class HaAuthorize extends litLocalizeLiteMixin(LitElement) {
         <ha-button
           appearance="plain"
           variant="neutral"
-          href="https://www.home-assistant.io/docs/authentication/"
+          href="https://www.equicrew.com"
           target="_blank"
           rel="noreferrer noopener"
         >

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Home Assistant</title>
+    <title>eq cube</title>
     <%= renderTemplate("_header.html.template") %>
     <%= renderTemplate("_style_base.html.template") %>
     <style>
@@ -45,9 +45,20 @@
     </style>
   </head>
   <body>
+    <video
+      id="login-bg-video"
+      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1;"
+      src="https://video.wixstatic.com/video/3a55ef_fc3d47482d204345a36da00e723fcd45/1080p/mp4/file.mp4"
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+      crossorigin="anonymous"
+    ></video>
     <div class="content">
       <div class="header">
-        <img src="/static/icons/favicon-192x192.png" alt="Home Assistant" />
+        <img src="/static/icons/favicon-192x192.png" alt="eq cube" />
       </div>
       <ha-authorize></ha-authorize>
     </div>

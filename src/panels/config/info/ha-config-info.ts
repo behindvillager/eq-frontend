@@ -118,11 +118,7 @@ class HaConfigInfo extends LitElement {
       >
         <div class="content">
           <ha-card outlined class="header">
-            <a
-              href=${documentationUrl(this.hass, "")}
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://www.equicrew.com" target="_blank" rel="noreferrer">
               <ha-logo-svg
                 title=${this.hass.localize(
                   "ui.panel.config.info.home_assistant_logo"
@@ -130,7 +126,7 @@ class HaConfigInfo extends LitElement {
               >
               </ha-logo-svg>
             </a>
-            <p>Home Assistant</p>
+            <p>eq cube</p>
             <ul class="versions">
               <li>
                 <span class="version-label"
@@ -189,15 +185,13 @@ class HaConfigInfo extends LitElement {
             </ul>
           </ha-card>
           <ha-card outlined class="ohf ${isDark ? "dark" : ""}">
-            <div>
-              ${this.hass.localize("ui.panel.config.info.proud_part_of")}
-            </div>
             <a
-              href="https://www.openhomefoundation.org"
+              href="https://www.equicrew.com/%C3%BCber-uns"
               target="_blank"
               rel="noreferrer"
+              style="text-decoration: none; color: inherit; font-size: 24px; font-weight: 500;"
             >
-              <img src="/static/icons/ohf.svg" alt="Open Home Foundation" />
+              equicrew
             </a>
           </ha-card>
 
@@ -279,7 +273,8 @@ class HaConfigInfo extends LitElement {
 
     const unsubSystemHealth = subscribeSystemHealthInfo(this.hass, (info) => {
       if (info?.homeassistant) {
-        this._installationMethod = info.homeassistant.info.installation_type;
+        // Override installation method with eq cube branding
+        this._installationMethod = "Supported by equicrew";
         unsubSystemHealth.then((unsub) => unsub());
       }
     });

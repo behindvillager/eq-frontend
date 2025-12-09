@@ -105,7 +105,7 @@ class HaLandingPage extends LandingPageBaseElement {
         <ha-button
           appearance="plain"
           variant="neutral"
-          href="https://www.home-assistant.io/getting-started/onboarding/"
+          href="https://www.equicrew.com"
           target="_blank"
           rel="noreferrer noopener"
         >
