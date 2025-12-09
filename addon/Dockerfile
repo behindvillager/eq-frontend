@@ -15,11 +15,12 @@ RUN apk add --no-cache \
     g++ \
     git
 
-# Copy package files and yarn patches
-COPY package.json yarn.lock ./
-COPY .yarn .yarn
+# Copy package files, yarn config and patches
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn/patches .yarn/patches
+COPY .yarn/releases .yarn/releases
 RUN corepack enable && \
-    yarn install --frozen-lockfile
+    yarn install --immutable
 
 # Copy source code
 COPY . .
