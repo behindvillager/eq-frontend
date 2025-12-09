@@ -1,47 +1,40 @@
-ARG BUILD_FROM
-FROM ${BUILD_FROM}
+ARG BUILD_FROM=ghcr.io/home-assistant/aarch64-base:alpine3.20
+FROM node:20-alpine AS builder
 
-# Install requirements for building
-RUN apk add --no-cache \
-    nodejs \
-    npm \
-    git \
-    python3 \
-    make \
-    g++
-
-# Set working directory
-WORKDIR /app
+WORKDIR /build
 
 # Copy package files
 COPY package.json yarn.lock ./
 
 # Install dependencies
-RUN npm install -g yarn && yarn install --frozen-lockfile
+RUN npm install -g yarn && \
+    yarn install --frozen-lockfile --production=false
 
-# Copy source code
+# Copy source
 COPY . .
 
-# Build the frontend
+# Build hassio frontend
 RUN yarn run build
 
-# Setup runtime
+# Runtime image
 FROM ${BUILD_FROM}
 
-RUN apk add --no-cache \
-    nodejs \
-    nginx
-
-WORKDIR /app
+RUN apk add --no-cache nginx
 
 # Copy built frontend
-COPY --from=0 /app/hassio/build /usr/share/nginx/html
+COPY --from=builder /build/hassio/build /usr/share/nginx/html
 
 # Copy nginx config
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+RUN mkdir -p /etc/nginx/http.d && \
+    echo 'server {' > /etc/nginx/http.d/default.conf && \
+    echo '    listen 8099;' >> /etc/nginx/http.d/default.conf && \
+    echo '    root /usr/share/nginx/html;' >> /etc/nginx/http.d/default.conf && \
+    echo '    index index.html;' >> /etc/nginx/http.d/default.conf && \
+    echo '    location / {' >> /etc/nginx/http.d/default.conf && \
+    echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '}' >> /etc/nginx/http.d/default.conf
 
-# Expose port
 EXPOSE 8099
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
