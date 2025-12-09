@@ -11,18 +11,13 @@ Custom frontend for Home Assistant with Equicrew branding and customizations.
 
 ## Installation
 
-Add this repository to your Home Assistant instance:
-
-1. Go to **Settings** → **Add-ons** → **Add-on Store**
-2. Click **⋮** (three dots) → **Repositories**
-3. Add: `https://github.com/behindvillager/eq-frontend`
-4. Install **Equicrew Frontend** from the store
-5. Start the add-on
-6. Access at `http://<your-ha-ip>:8099`
-
-## Configuration
-
-No configuration needed. The add-on runs nginx on port 8099.
+1. Open Home Assistant
+2. Go to **Settings** → **Add-ons** → **Add-on Store**
+3. Click **⋮** (three dots) → **Repositories**
+4. Add: `https://github.com/behindvillager/eq-frontend`
+5. Find and install **Equicrew Frontend**
+6. Start the add-on
+7. Access at `http://<your-ha-ip>:8099`
 
 ## Version
 
