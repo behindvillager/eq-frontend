@@ -23,6 +23,7 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Create the runtime container
+# ARG must be before FROM to be available in FROM instruction
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
