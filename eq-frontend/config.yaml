@@ -1,5 +1,5 @@
 name: "Equicrew Frontend"
-version: "2024.12.0-eq2"
+version: "2024.12.0-eq3"
 slug: eq-frontend
 description: "Custom Equicrew Home Assistant Frontend based on Home Assistant 2024.12"
 url: https://github.com/behindvillager/eq-frontend
@@ -13,6 +13,7 @@ startup: services
 boot: auto
 init: false
 image: ghcr.io/behindvillager/eq-frontend-{arch}
+homeassistant_api: true
 ports:
   8099/tcp: 8099
 ports_description:

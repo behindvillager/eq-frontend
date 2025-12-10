@@ -36,7 +36,7 @@ RUN apk add --no-cache nginx
 # Copy built frontend from builder stage
 COPY --from=builder /build/hass_frontend /usr/share/nginx/html
 
-# Configure nginx with larger buffer sizes for Home Assistant
+# Configure nginx with API proxy to Home Assistant Core
 RUN mkdir -p /etc/nginx/http.d && \
     echo 'server {' > /etc/nginx/http.d/default.conf && \
     echo '    listen 8099;' >> /etc/nginx/http.d/default.conf && \
@@ -44,9 +44,46 @@ RUN mkdir -p /etc/nginx/http.d && \
     echo '    index index.html;' >> /etc/nginx/http.d/default.conf && \
     echo '' >> /etc/nginx/http.d/default.conf && \
     echo '    # Increase buffer sizes for large URIs and headers' >> /etc/nginx/http.d/default.conf && \
-    echo '    large_client_header_buffers 4 32k;' >> /etc/nginx/http.d/default.conf && \
-    echo '    client_header_buffer_size 32k;' >> /etc/nginx/http.d/default.conf && \
+    echo '    large_client_header_buffers 4 64k;' >> /etc/nginx/http.d/default.conf && \
+    echo '    client_header_buffer_size 64k;' >> /etc/nginx/http.d/default.conf && \
+    echo '    proxy_buffer_size 128k;' >> /etc/nginx/http.d/default.conf && \
+    echo '    proxy_buffers 4 256k;' >> /etc/nginx/http.d/default.conf && \
+    echo '    proxy_busy_buffers_size 256k;' >> /etc/nginx/http.d/default.conf && \
     echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy API requests to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /api/ {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/api/;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Upgrade $http_upgrade;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Connection "upgrade";' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_read_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy Auth requests to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /auth/ {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/auth/;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy local files to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /local/ {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/local/;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy HACS files to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /hacsfiles/ {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/hacsfiles/;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Serve frontend static files' >> /etc/nginx/http.d/default.conf && \
     echo '    location / {' >> /etc/nginx/http.d/default.conf && \
     echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/http.d/default.conf && \
     echo '    }' >> /etc/nginx/http.d/default.conf && \
