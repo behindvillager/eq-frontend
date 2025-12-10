@@ -1,9 +1,7 @@
 # Multi-stage build for Equicrew Frontend
-# Define ARG at the top level to be available across all stages
 ARG BUILD_FROM
 
 # Stage 1: Build the frontend
-# Always use amd64 for building (GitHub Actions runners are amd64)
 FROM --platform=linux/amd64 node:20-alpine AS builder
 
 WORKDIR /build
@@ -29,7 +27,6 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Create the runtime container
-# Re-declare ARG for this stage
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
