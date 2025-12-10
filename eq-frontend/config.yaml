@@ -1,5 +1,5 @@
 name: "Equicrew Frontend"
-version: "2024.12.0-eq4"
+version: "2024.12.0-eq5"
 slug: eq-frontend
 description: "Custom Equicrew Home Assistant Frontend based on Home Assistant 2024.12"
 url: https://github.com/behindvillager/eq-frontend

@@ -62,13 +62,34 @@ RUN mkdir -p /etc/nginx/http.d && \
     echo '        proxy_read_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
     echo '    }' >> /etc/nginx/http.d/default.conf && \
     echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Proxy Auth requests to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /auth/ {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/auth/;' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy Auth API endpoints to Home Assistant Core (NOT /auth/authorize which serves HTML)' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /auth/token {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/auth/token;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /auth/providers {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/auth/providers;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /auth/login_flow {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/auth/login_flow;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /auth/authorize {' >> /etc/nginx/http.d/default.conf && \
+    echo '        # Serve our own authorize.html, not HA Cores' >> /etc/nginx/http.d/default.conf && \
+    echo '        try_files /authorize.html =404;' >> /etc/nginx/http.d/default.conf && \
     echo '    }' >> /etc/nginx/http.d/default.conf && \
     echo '' >> /etc/nginx/http.d/default.conf && \
     echo '    # Proxy local files to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
