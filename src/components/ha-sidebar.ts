@@ -31,6 +31,7 @@ import { toggleAttribute } from "../common/dom/toggle_attribute";
 import { stringCompare } from "../common/string/compare";
 import { computeRTL } from "../common/util/compute_rtl";
 import { throttle } from "../common/util/throttle";
+import { EQ_DEFAULT_HIDDEN_PANELS, EQ_DEFAULT_PANEL_ORDER } from "../eq-config";
 import { subscribeFrontendUserData } from "../data/frontend";
 import type { ActionHandlerDetail } from "../data/lovelace/action_handler";
 import type { PersistentNotification } from "../data/persistent_notification";
@@ -220,14 +221,18 @@ class HaSidebar extends SubscribeMixin(LitElement) {
           this._panelOrder = value?.panelOrder;
           this._hiddenPanels = value?.hiddenPanels;
 
-          // fallback to old localStorage values
+          // fallback to eq-config defaults, then localStorage
           if (!this._panelOrder) {
             const storedOrder = localStorage.getItem("sidebarPanelOrder");
-            this._panelOrder = storedOrder ? JSON.parse(storedOrder) : [];
+            this._panelOrder = storedOrder
+              ? JSON.parse(storedOrder)
+              : EQ_DEFAULT_PANEL_ORDER;
           }
           if (!this._hiddenPanels) {
             const storedHidden = localStorage.getItem("sidebarHiddenPanels");
-            this._hiddenPanels = storedHidden ? JSON.parse(storedHidden) : [];
+            this._hiddenPanels = storedHidden
+              ? JSON.parse(storedHidden)
+              : EQ_DEFAULT_HIDDEN_PANELS;
           }
         }
       ),
