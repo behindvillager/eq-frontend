@@ -59,6 +59,19 @@ RUN mkdir -p /etc/nginx/http.d && \
     echo '    proxy_buffers 4 256k;' >> /etc/nginx/http.d/default.conf && \
     echo '    proxy_busy_buffers_size 256k;' >> /etc/nginx/http.d/default.conf && \
     echo '' >> /etc/nginx/http.d/default.conf && \
+    echo '    # WebSocket proxy for Home Assistant (must be before /api/)' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /api/websocket {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://homeassistant:8123/api/websocket;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Upgrade $http_upgrade;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Connection "upgrade";' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_read_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_send_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '' >> /etc/nginx/http.d/default.conf && \
     echo '    # Proxy API requests to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
     echo '    location /api/ {' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_pass http://homeassistant:8123/api/;' >> /etc/nginx/http.d/default.conf && \
