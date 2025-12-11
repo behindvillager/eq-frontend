@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     python3 \
     make \
     g++ \
-    git
+    git \
+    bash
 
 # Copy package files, yarn config and patches
 COPY package.json yarn.lock .yarnrc.yml ./
@@ -23,8 +24,8 @@ RUN corepack enable && \
 # Copy source code
 COPY . .
 
-# Build frontend
-RUN yarn build
+# Download all translations and build frontend
+RUN yarn gulp download-translations && yarn build
 
 # Stage 2: Create the runtime container
 ARG BUILD_FROM
