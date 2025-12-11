@@ -45,6 +45,14 @@ RUN apk add --no-cache nginx
 # Copy built frontend from builder stage
 COPY --from=builder /build/hass_frontend /usr/share/nginx/html
 
+# Fix index.html: Remove Jinja2 templates that HA Core normally processes
+RUN sed -i 's/{{ theme_color }}/#03a9f4/g' /usr/share/nginx/html/index.html && \
+    sed -i '/{%- for extra_module in extra_modules -%}/,/{%- endfor -%}/d' /usr/share/nginx/html/index.html && \
+    sed -i '/{%- for extra_script in extra_js_es5 -%}/,/{%- endfor -%}/d' /usr/share/nginx/html/index.html
+
+# Create manifest.json for PWA
+RUN echo '{"name":"eq cube","short_name":"eq cube","start_url":"/","display":"standalone","background_color":"#111111","theme_color":"#03a9f4","icons":[{"src":"/static/icons/favicon-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/static/icons/favicon.ico","sizes":"64x64","type":"image/x-icon"}]}' > /usr/share/nginx/html/manifest.json
+
 # Configure nginx with API proxy to Home Assistant Core
 RUN mkdir -p /etc/nginx/http.d && \
     echo 'server {' > /etc/nginx/http.d/default.conf && \
