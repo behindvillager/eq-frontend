@@ -24,8 +24,16 @@ RUN corepack enable && \
 # Copy source code
 COPY . .
 
-# Download all translations and build frontend
-RUN yarn gulp download-translations && yarn build
+# Fetch translations from HA nightly workflow (uses GITHUB_TOKEN from build secret)
+RUN --mount=type=secret,id=github_token \
+    export GITHUB_TOKEN=$(cat /run/secrets/github_token 2>/dev/null || echo "") && \
+    if [ -n "$GITHUB_TOKEN" ]; then \
+        echo "Fetching translations with GITHUB_TOKEN..." && \
+        yarn gulp fetch-nightly-translations || echo "Warning: Could not fetch translations, continuing with English only"; \
+    else \
+        echo "No GITHUB_TOKEN, building with English only"; \
+    fi && \
+    yarn build
 
 # Stage 2: Create the runtime container
 ARG BUILD_FROM
