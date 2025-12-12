@@ -12,9 +12,9 @@
  */
 export const EQ_DEFAULT_HIDDEN_PANELS: string[] = [
   // Add panel URL paths to hide by default
-  // Examples: "climate", "lighting", "security", "energy", "map", "logbook", "history"
+  // Examples: "climate", "light", "security", "energy", "map", "logbook", "history"
   "climate",
-  "lighting",
+  "light",
   "security",
 ];
 
