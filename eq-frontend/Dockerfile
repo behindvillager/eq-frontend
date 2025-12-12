@@ -32,8 +32,51 @@ RUN --mount=type=secret,id=github_token \
         yarn gulp fetch-nightly-translations || echo "Warning: Could not fetch translations, continuing with English only"; \
     else \
         echo "No GITHUB_TOKEN, building with English only"; \
-    fi && \
-    yarn build
+        fi && \
+        yarn build && \
+        node - <<'NODE'
+const fs = require("fs");
+const path = require("path");
+
+const indexPath = path.join("/build", "hass_frontend", "index.html");
+let html = fs.readFileSync(indexPath, "utf-8");
+
+// Replace theme color placeholder
+html = html.replace(/\{\{\s*theme_color\s*\}\}/g, "#03a9f4");
+
+// Strip Jinja loops that are normally rendered by HA backend
+html = html.replace(/\{%-\s*for\s+extra_module\s+in\s+extra_modules\s*-\%\}.*?\{%-\s*endfor\s*-\%\}/gs, "");
+html = html.replace(/\{%-\s*for\s+extra_script\s+in\s+extra_js_es5\s*-\%\}.*?\{%-\s*endfor\s*-\%\}/gs, "");
+
+fs.writeFileSync(indexPath, html);
+
+// Write a minimal manifest.json for PWA
+const manifest = {
+    name: "eq cube",
+    short_name: "eq cube",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#111111",
+    theme_color: "#03a9f4",
+    icons: [
+        {
+            src: "/static/icons/favicon-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+        },
+        {
+            src: "/static/icons/favicon.ico",
+            sizes: "64x64",
+            type: "image/x-icon",
+        },
+    ],
+};
+
+fs.writeFileSync(
+    path.join("/build", "hass_frontend", "manifest.json"),
+    JSON.stringify(manifest)
+);
+NODE
 
 # Stage 2: Create the runtime container
 ARG BUILD_FROM
@@ -44,14 +87,6 @@ RUN apk add --no-cache nginx
 
 # Copy built frontend from builder stage
 COPY --from=builder /build/hass_frontend /usr/share/nginx/html
-
-# Fix index.html: Remove Jinja2 templates that HA Core normally processes
-RUN sed -i 's/{{ theme_color }}/#03a9f4/g' /usr/share/nginx/html/index.html && \
-    sed -i '/{%- for extra_module in extra_modules -%}/,/{%- endfor -%}/d' /usr/share/nginx/html/index.html && \
-    sed -i '/{%- for extra_script in extra_js_es5 -%}/,/{%- endfor -%}/d' /usr/share/nginx/html/index.html
-
-# Create manifest.json for PWA
-RUN echo '{"name":"eq cube","short_name":"eq cube","start_url":"/","display":"standalone","background_color":"#111111","theme_color":"#03a9f4","icons":[{"src":"/static/icons/favicon-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/static/icons/favicon.ico","sizes":"64x64","type":"image/x-icon"}]}' > /usr/share/nginx/html/manifest.json
 
 # Configure nginx with API proxy to Home Assistant Core
 RUN mkdir -p /etc/nginx/http.d && \
