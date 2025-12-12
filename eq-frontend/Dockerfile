@@ -7,173 +7,38 @@ FROM --platform=linux/amd64 node:20-alpine AS builder
 WORKDIR /build
 
 # Install build dependencies
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    git \
-    bash
+RUN apk add --no-cache python3 make g++ git bash
 
 # Copy package files, yarn config and patches
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn/patches .yarn/patches
 COPY .yarn/releases .yarn/releases
-RUN corepack enable && \
-    yarn install --immutable
+RUN corepack enable && yarn install --immutable
 
 # Copy source code
 COPY . .
 
-# Fetch translations from HA nightly workflow (uses GITHUB_TOKEN from build secret)
-RUN --mount=type=secret,id=github_token \
-    export GITHUB_TOKEN=$(cat /run/secrets/github_token 2>/dev/null || echo "") && \
-    if [ -n "$GITHUB_TOKEN" ]; then \
-        echo "Fetching translations with GITHUB_TOKEN..." && \
-        yarn gulp fetch-nightly-translations || echo "Warning: Could not fetch translations, continuing with English only"; \
-    else \
-        echo "No GITHUB_TOKEN, building with English only"; \
-        fi && \
-        yarn build && \
-        node - <<'NODE'
-const fs = require("fs");
-const path = require("path");
+# Build frontend
+RUN yarn build
 
-const indexPath = path.join("/build", "hass_frontend", "index.html");
-let html = fs.readFileSync(indexPath, "utf-8");
-
-// Replace theme color placeholder
-html = html.replace(/\{\{\s*theme_color\s*\}\}/g, "#03a9f4");
-
-// Strip Jinja loops that are normally rendered by HA backend
-html = html.replace(/\{%-\s*for\s+extra_module\s+in\s+extra_modules\s*-\%\}.*?\{%-\s*endfor\s*-\%\}/gs, "");
-html = html.replace(/\{%-\s*for\s+extra_script\s+in\s+extra_js_es5\s*-\%\}.*?\{%-\s*endfor\s*-\%\}/gs, "");
-
-fs.writeFileSync(indexPath, html);
-
-// Write a minimal manifest.json for PWA
-const manifest = {
-    name: "eq cube",
-    short_name: "eq cube",
-    start_url: "/",
-    display: "standalone",
-    background_color: "#111111",
-    theme_color: "#03a9f4",
-    icons: [
-        {
-            src: "/static/icons/favicon-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-        },
-        {
-            src: "/static/icons/favicon.ico",
-            sizes: "64x64",
-            type: "image/x-icon",
-        },
-    ],
-};
-
-fs.writeFileSync(
-    path.join("/build", "hass_frontend", "manifest.json"),
-    JSON.stringify(manifest)
-);
-NODE
+# Post-process index.html to remove Jinja templates and create manifest
+RUN sed -i 's/{{ theme_color }}/#03a9f4/g' /build/hass_frontend/index.html && \
+    sed -i 's/{%- for extra_module in extra_modules -%}[^}]*{%- endfor -%}//g' /build/hass_frontend/index.html && \
+    sed -i 's/{%- for extra_script in extra_js_es5 -%}[^}]*{%- endfor -%}//g' /build/hass_frontend/index.html && \
+    echo '{"name":"eq cube","short_name":"eq cube","start_url":"/","display":"standalone","background_color":"#111111","theme_color":"#03a9f4","icons":[{"src":"/static/icons/favicon-192x192.png","sizes":"192x192","type":"image/png"}]}' > /build/hass_frontend/manifest.json
 
 # Stage 2: Create the runtime container
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Install nginx for serving the frontend
+# Install nginx
 RUN apk add --no-cache nginx
 
-# Copy built frontend from builder stage
+# Copy built frontend
 COPY --from=builder /build/hass_frontend /usr/share/nginx/html
 
-# Configure nginx with API proxy to Home Assistant Core
-RUN mkdir -p /etc/nginx/http.d && \
-    echo 'server {' > /etc/nginx/http.d/default.conf && \
-    echo '    listen 8099;' >> /etc/nginx/http.d/default.conf && \
-    echo '    root /usr/share/nginx/html;' >> /etc/nginx/http.d/default.conf && \
-    echo '    index index.html;' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Increase buffer sizes for large URIs and headers' >> /etc/nginx/http.d/default.conf && \
-    echo '    large_client_header_buffers 4 64k;' >> /etc/nginx/http.d/default.conf && \
-    echo '    client_header_buffer_size 64k;' >> /etc/nginx/http.d/default.conf && \
-    echo '    proxy_buffer_size 128k;' >> /etc/nginx/http.d/default.conf && \
-    echo '    proxy_buffers 4 256k;' >> /etc/nginx/http.d/default.conf && \
-    echo '    proxy_busy_buffers_size 256k;' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # WebSocket proxy for Home Assistant (must be before /api/)' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /api/websocket {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/api/websocket;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Upgrade $http_upgrade;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Connection "upgrade";' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_read_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_send_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Proxy API requests to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /api/ {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/api/;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Upgrade $http_upgrade;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Connection "upgrade";' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_read_timeout 86400;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Proxy Auth API endpoints to Home Assistant Core (NOT /auth/authorize which serves HTML)' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /auth/token {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/auth/token;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /auth/providers {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/auth/providers;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /auth/login_flow {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/auth/login_flow;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /auth/authorize {' >> /etc/nginx/http.d/default.conf && \
-    echo '        # Serve our own authorize.html, not HA Cores' >> /etc/nginx/http.d/default.conf && \
-    echo '        try_files /authorize.html =404;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Proxy local files to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /local/ {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/local/;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Proxy HACS files to Home Assistant Core' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /hacsfiles/ {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://homeassistant:8123/hacsfiles/;' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Serve frontend static files' >> /etc/nginx/http.d/default.conf && \
-    echo '    location / {' >> /etc/nginx/http.d/default.conf && \
-    echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/http.d/default.conf && \
-    echo '    }' >> /etc/nginx/http.d/default.conf && \
-    echo '}' >> /etc/nginx/http.d/default.conf
+# Copy nginx config
+COPY eq-frontend/nginx.conf /etc/nginx/http.d/default.conf
 
 # Copy run script
 COPY eq-frontend/run.sh /
@@ -181,5 +46,4 @@ RUN chmod +x /run.sh
 
 EXPOSE 8099
 
-# Start via run.sh
 CMD ["/run.sh"]
