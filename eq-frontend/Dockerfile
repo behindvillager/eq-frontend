@@ -18,9 +18,7 @@ RUN corepack enable && yarn install --immutable
 # Copy source code
 COPY . .
 
-# Build frontend with HASS_URL set to prevent Jinja templates from being included
-# When HASS_URL is set, the build system skips the {%- for ... -%} blocks
-ENV HASS_URL="/"
+# Build frontend (Jinja templates removed from source, no env var needed)
 RUN yarn build
 
 # Create manifest.json for PWA
