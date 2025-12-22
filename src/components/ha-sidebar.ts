@@ -56,6 +56,9 @@ import "./user/ha-user-badge";
 
 const SHOW_AFTER_SPACER = ["config", "developer-tools"];
 
+// Panels that are fixed and should not appear in the sidebar list
+const FIXED_PANELS = ["profile", "config"];
+
 const SUPPORT_SCROLL_IF_NEEDED = "scrollIntoViewIfNeeded" in document.body;
 
 const SORT_VALUE_URL_PATHS = {
@@ -155,10 +158,24 @@ export const computePanels = memoizeOne(
     const beforeSpacer: PanelInfo[] = [];
     const afterSpacer: PanelInfo[] = [];
 
-    Object.values(panels).forEach((panel) => {
+    // Filter out fixed panels first (profile, config are handled separately)
+    const allPanels = Object.values(panels).filter(
+      (panel) => !FIXED_PANELS.includes(panel.url_path)
+    );
+
+    allPanels.forEach((panel) => {
+      const isDefaultPanel = panel.url_path === defaultPanel;
+
+      // Skip panel if:
+      // - It's explicitly hidden
+      // - It has no title (unless it's the default panel)
+      // - It has default_visible: false (unless user added it to panelsOrder)
       if (
-        hiddenPanels.includes(panel.url_path) ||
-        (!panel.title && panel.url_path !== defaultPanel)
+        !isDefaultPanel &&
+        (!panel.title ||
+          hiddenPanels.includes(panel.url_path) ||
+          (panel.default_visible === false &&
+            !panelsOrder.includes(panel.url_path)))
       ) {
         return;
       }
