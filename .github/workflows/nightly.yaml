@@ -1,9 +1,11 @@
 name: Nightly
 
+# DISABLED for eq-frontend fork - we don't have LOKALISE_TOKEN
+# To re-enable, remove the 'if: false' below or uncomment the triggers
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 1 * * *"
+  # schedule:
+  #   - cron: "0 1 * * *"
 
 env:
   PYTHON_VERSION: "3.13"
