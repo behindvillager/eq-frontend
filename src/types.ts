@@ -138,7 +138,6 @@ export interface PanelInfo<T = Record<string, any> | null> {
   title: string | null;
   url_path: string;
   config_panel_domain?: string;
-  default_visible?: boolean;
 }
 
 export type Panels = Record<string, PanelInfo>;
