@@ -156,9 +156,18 @@ export const computePanels = memoizeOne(
     const afterSpacer: PanelInfo[] = [];
 
     Object.values(panels).forEach((panel) => {
+      const isDefaultPanel = panel.url_path === defaultPanel;
+
+      // Skip panel if:
+      // - It's explicitly hidden by user
+      // - It has no title (unless it's the default panel)
+      // - It has default_visible: false and user hasn't added it to panelsOrder
       if (
         hiddenPanels.includes(panel.url_path) ||
-        (!panel.title && panel.url_path !== defaultPanel)
+        (!panel.title && !isDefaultPanel) ||
+        (panel.default_visible === false &&
+          !isDefaultPanel &&
+          !panelsOrder.includes(panel.url_path))
       ) {
         return;
       }
