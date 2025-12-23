@@ -439,12 +439,17 @@ class HaSidebar extends SubscribeMixin(LitElement) {
   }
 
   private _renderPanels(panels: PanelInfo[], selectedPanel: string) {
-    return panels.map((panel) =>
-      this._renderPanel(
-        panel.url_path,
+    return panels.map((panel) => {
+      // Normalize title for translation lookup (backend may send uppercase titles)
+      const titleKey = panel.title?.toLowerCase();
+      const translatedTitle =
         panel.url_path === this.hass.defaultPanel
           ? panel.title || this.hass.localize("panel.states")
-          : this.hass.localize(`panel.${panel.title}`) || panel.title,
+          : this.hass.localize(`panel.${titleKey}`) || panel.title;
+
+      return this._renderPanel(
+        panel.url_path,
+        translatedTitle,
         panel.icon,
         panel.url_path === this.hass.defaultPanel && !panel.icon
           ? PANEL_ICONS.lovelace
@@ -452,8 +457,8 @@ class HaSidebar extends SubscribeMixin(LitElement) {
             ? PANEL_ICONS[panel.url_path]
             : undefined,
         selectedPanel
-      )
-    );
+      );
+    });
   }
 
   private _renderPanel(

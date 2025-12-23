@@ -72,9 +72,9 @@ jobs:
           context: .
           file: eq-frontend/Dockerfile
           platforms: ${{ steps.platform.outputs.platform }}
-          build-args: BUILD_FROM=${{ steps.base_image.outputs.image }}
-          secrets: |
-            github_token=${{ secrets.GITHUB_TOKEN }}
+          build-args: |
+            BUILD_FROM=${{ steps.base_image.outputs.image }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/eq-frontend-${{ matrix.arch }}:latest

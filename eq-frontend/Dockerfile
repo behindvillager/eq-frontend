@@ -4,6 +4,9 @@ ARG BUILD_FROM
 # Stage 1: Build the frontend
 FROM --platform=linux/amd64 node:20-alpine AS builder
 
+# GitHub token for fetching translations
+ARG GITHUB_TOKEN
+
 WORKDIR /build
 
 # Install build dependencies
@@ -18,8 +21,8 @@ RUN corepack enable && yarn install --immutable
 # Copy source code
 COPY . .
 
-# Build frontend (Jinja templates removed from source, no env var needed)
-RUN yarn build
+# Fetch translations and build frontend
+RUN GITHUB_TOKEN=${GITHUB_TOKEN} ./node_modules/.bin/gulp fetch-nightly-translations && yarn build
 
 # Create manifest.json for PWA
 RUN echo '{"name":"eq cube","short_name":"eq cube","start_url":"/","display":"standalone","background_color":"#111111","theme_color":"#03a9f4","icons":[{"src":"/static/icons/favicon-192x192.png","sizes":"192x192","type":"image/png"}]}' > /build/hass_frontend/manifest.json
