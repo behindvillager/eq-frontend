@@ -11,6 +11,7 @@ import {
   mdiMenu,
   mdiMenuOpen,
   mdiPlayBoxMultiple,
+  mdiPuzzle,
   mdiTooltipAccount,
   mdiViewDashboard,
 } from "@mdi/js";
@@ -71,6 +72,7 @@ export const PANEL_ICONS = {
   calendar: mdiCalendar,
   "developer-tools": mdiHammer,
   energy: mdiLightningBolt,
+  hacs: mdiPuzzle,
   history: mdiChartBox,
   logbook: mdiFormatListBulletedType,
   lovelace: mdiViewDashboard,
