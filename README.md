@@ -1,31 +1,62 @@
-# Home Assistant Frontend
+# Equicrew Assistant Frontend
 
-This is the repository for the official [Home Assistant](https://home-assistant.io) frontend.
+Das offizielle Frontend für den **EQcube** - powered by [Equicrew](https://equicrew.de).
 
-[![Screenshot of the frontend](https://raw.githubusercontent.com/home-assistant/frontend/master/docs/screenshot.png)](https://demo.home-assistant.io/)
+Dieses Projekt ist ein Fork des [Home Assistant Frontend](https://github.com/home-assistant/frontend) und wurde speziell für die Equicrew Smart Home Lösung angepasst.
 
-- [View demo of Home Assistant](https://demo.home-assistant.io/)
-- [More information about Home Assistant](https://home-assistant.io)
-- [Frontend development instructions](https://developers.home-assistant.io/docs/frontend/development/)
+## Features
+
+### Equicrew Anpassungen (v1.0.0)
+
+- 🎨 **Equicrew Branding** - Eigene Logos, Favicons und App-Icons
+- 📱 **Android Companion App Fix** - Logout-Funktion funktioniert korrekt
+- 🧩 **HACS Integration** - Vollständige Unterstützung für HACS Panel und Ressourcen
+- 🌍 **66 Sprachen** - Alle Home Assistant Übersetzungen integriert
+- 🏠 **Panel-Lokalisierung** - Korrekte Übersetzung aller Menüpunkte (Übersicht, etc.)
+- 🔧 **Panel-Filterung** - Nur relevante Panels für EQcube Nutzer
+
+### Technische Änderungen
+
+| Version | Beschreibung                         |
+| ------- | ------------------------------------ |
+| eq16    | Android Companion App Logout Fix     |
+| eq17    | Equicrew Branding Integration        |
+| eq18    | HACS Resources Proxy                 |
+| eq19    | Panel Filtering (default_visible)    |
+| eq20    | nginx Frontend File Serving          |
+| eq21    | Übersetzungen & Titel-Normalisierung |
+| eq22    | Default Panel Lokalisierung          |
+| eq23    | HACS Fallback Icon                   |
+
+## Installation
+
+### Docker Image
+
+```bash
+docker pull ghcr.io/behindvillager/eq-frontend:v1.0.0
+```
+
+### Als Home Assistant Add-on
+
+Das eq-frontend Add-on ist im EQcube vorinstalliert und läuft auf Port 8099.
 
 ## Development
 
-- Initial setup: `script/setup`
-- Development: [Instructions](https://developers.home-assistant.io/docs/frontend/development/)
-- Production build: `script/build_frontend`
-- Gallery: `cd gallery && script/develop_gallery`
-- Supervisor: [Instructions](https://developers.home-assistant.io/docs/supervisor/developing)
+- Initial Setup: `script/setup`
+- Development Server: `script/develop`
+- Production Build: `script/build_frontend`
+- Übersetzungen laden: `gulp fetch-nightly-translations` (benötigt GITHUB_TOKEN)
 
-## Frontend development
+## Upstream
 
-### Classic environment
+Dieses Projekt basiert auf dem [Home Assistant Frontend](https://github.com/home-assistant/frontend) und wird regelmäßig mit dem Upstream synchronisiert.
 
-A complete guide can be found at the following [link](https://www.home-assistant.io/developers/frontend/). It describes a short guide for the build of project.
+## Lizenz
 
-## License
+Apache 2.0 License - basierend auf dem Home Assistant Projekt.
 
-Home Assistant is open-source and Apache 2 licensed. Feel free to browse the repository, learn and reuse parts in your own projects.
+---
 
-We use [BrowserStack](https://www.browserstack.com) to test Home Assistant on a large variety of devices.
+**EQcube** - Smart Home made in Germany 🇩🇪
 
-[![Home Assistant - A project from the Open Home Foundation](https://www.openhomefoundation.org/badges/home-assistant.png)](https://www.openhomefoundation.org/)
+[![Equicrew](https://equicrew.de/logo.png)](https://equicrew.de)
