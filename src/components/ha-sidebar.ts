@@ -442,10 +442,16 @@ class HaSidebar extends SubscribeMixin(LitElement) {
     return panels.map((panel) => {
       // Normalize title for translation lookup (backend may send uppercase titles)
       const titleKey = panel.title?.toLowerCase();
-      const translatedTitle =
-        panel.url_path === this.hass.defaultPanel
-          ? panel.title || this.hass.localize("panel.states")
-          : this.hass.localize(`panel.${titleKey}`) || panel.title;
+      let translatedTitle: string | null;
+
+      if (panel.url_path === this.hass.defaultPanel) {
+        // For default panel, always use localized "panel.states" (Übersicht/Overview)
+        translatedTitle = this.hass.localize("panel.states");
+      } else {
+        // For other panels, try to translate, fallback to original title
+        translatedTitle =
+          this.hass.localize(`panel.${titleKey}`) || panel.title;
+      }
 
       return this._renderPanel(
         panel.url_path,
